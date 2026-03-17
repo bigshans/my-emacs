@@ -146,6 +146,7 @@
 
 (setq use-package-always-ensure t)
 
+;; * 内置包
 ;; ** recentf
 
 (use-package recentf
@@ -159,18 +160,6 @@
   ;; 自动保存 recentf 列表（默认是退出时才保存，容易丢失）
   (run-at-time nil 300 'recentf-save-list))
 
-;; ** no-littering 规范配置目录结构
-
-;; 整理目录文件，保持 =~/.emacs.d= 整洁
-
-(use-package no-littering
-  :config
-  ;; 这会将所有的最近打开记录、历史等自动存入 ~/.emacs.d/var/ 和 ~/.emacs.d/etc/
-  (setq auto-save-file-name-transforms
-        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
-  (setq backup-directory-alist
-      `(("." . ,(no-littering-expand-var-file-name "backups/")))))
-
 ;; ** outline 设置，文档化配置文件注释。
 
 ;; 设置 outline 折叠
@@ -183,6 +172,19 @@
 	 (emacs-lisp-mode . my-outline/setup-elisp)
 	 )
   )
+
+;; * 规范配置
+;; ** no-littering 规范配置目录结构
+
+;; 整理目录文件，保持 =~/.emacs.d= 整洁
+
+(use-package no-littering
+  :config
+  ;; 这会将所有的最近打开记录、历史等自动存入 ~/.emacs.d/var/ 和 ~/.emacs.d/etc/
+  (setq auto-save-file-name-transforms
+        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+  (setq backup-directory-alist
+      `(("." . ,(no-littering-expand-var-file-name "backups/")))))
 
 ;; * 主题配置
 
@@ -230,8 +232,9 @@
   (setq evil-undo-system 'undo-fu)
   (setq evil-want-C-u-scroll t)
   ;; 禁止小写 y/p 自动关联系统剪贴板
-  (setq evil-want-clipboard nil) 
-  
+  (setq select-enable-clipboard nil
+	select-enable-clipboard nil)
+
   :config
   (evil-mode 1)
   (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
@@ -671,7 +674,6 @@
   (set-selection-coding-system 'utf-8)
   (set-next-selection-coding-system 'utf-8)
   (setq-default process-coding-system '((utf-8 . utf-8)))
-  (setenv "LC_ALL" "C")
   (dirvish-override-dired-mode)
   :config
   ;; --- 界面极简设置 ---
@@ -718,3 +720,17 @@
 
   ;; 开启跟随模式
   (dirvish-side-follow-mode 1))
+
+;; * Git
+
+;; ** magit
+
+(use-package magit
+  :bind ("C-x g" . magit-status)
+  :init
+  (my-leader-def
+    :prefix "SPC"
+    "g" '(:ignore t :which-key "magit")
+    "gg" '(magit-status :which-key "git status")
+   )
+  )
