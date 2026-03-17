@@ -4,13 +4,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(consult corfu dirvish doom-themes evil-collection
-	     evil-nerd-commenter evil-numbers evil-surround general
-	     kind-icon markdown-mode math-preview nerd-icons
-	     no-littering olivetti orderless rainbow-delimiters sis
-	     smartparens undo-fu undohist vertico yasnippet-capf
-	     yasnippet-snippets))
+ '(package-selected-packages nil)
  '(package-vc-selected-packages
    '((lsp-bridge :url "https://github.com/manateelazycat/lsp-bridge"))))
 (custom-set-faces

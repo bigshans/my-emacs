@@ -108,7 +108,6 @@
 ;; 禁止自动弹出原生编译的警告和错误窗口。
 (setq native-comp-async-report-warnings-errors 'silent)
 
-
 ;; 去除烦人的铃声
 
 (setq ring-bell-function 'ignore)
@@ -147,30 +146,18 @@
 
 (setq use-package-always-ensure t)
 
-;; ** 配置主题
+;; ** recentf
 
-;; 主题为 dracula 。
-
-(use-package doom-themes
-  :ensure t
-  :custom
-  (doom-themes-enable-bold t)
-  (doom-themes-enable-italic t)
+(use-package recentf
+  :ensure nil ; 内置功能不需要下载
+  :hook (after-init . recentf-mode)
   :config
-  (load-theme 'doom-dracula t)
-
-  (doom-themes-visual-bell-config)
-  (doom-themes-neotree-config)
-  (doom-themes-treemacs-config)
-  (doom-themes-org-config)
-  )
-
-;; 专门针对 emacs-lisp-mode
-
-(add-hook 'emacs-lisp-mode-hook #'(lambda ()
-  (font-lock-add-keywords nil
-    '(("\\(;.*\\)"  1 '(:foreground "#E67E22" :slant italic) t)
-      ("\\(\".*?\"\\)" 0 '(:foreground "#E67E22") t)))))
+  (setq recentf-max-saved-items 200     ; 设置保存最近文件的上限
+        recentf-exclude '("/tmp/" "/ssh:" "/var/folders/" ".*-autoloads\\.el\\" ".*\\.gz\\") ; 排除掉不需要记录的路径
+        recentf-auto-cleanup 'never)   ; 避免在启动时因为检查远程文件而卡顿
+  
+  ;; 自动保存 recentf 列表（默认是退出时才保存，容易丢失）
+  (run-at-time nil 300 'recentf-save-list))
 
 ;; ** no-littering 规范配置目录结构
 
@@ -197,36 +184,39 @@
 	 )
   )
 
-;; ** recentf
+;; * 主题配置
 
-(use-package recentf
-  :ensure nil ; 内置功能不需要下载
-  :hook (after-init . recentf-mode)
-  :config
-  (setq recentf-max-saved-items 200     ; 设置保存最近文件的上限
-        recentf-exclude '("/tmp/" "/ssh:" "/var/folders/" ".*-autoloads\\.el\\" ".*\\.gz\\") ; 排除掉不需要记录的路径
-        recentf-auto-cleanup 'never)   ; 避免在启动时因为检查远程文件而卡顿
-  
-  ;; 自动保存 recentf 列表（默认是退出时才保存，容易丢失）
-  (run-at-time nil 300 'recentf-save-list))
+;; ** 配置主题
 
-;; ** undo-fu
+;; 主题为 dracula 。
 
-(use-package undo-fu
-  :ensure t)
-(use-package undohist
+(use-package doom-themes
   :ensure t
-  ;; 关键：确保在 Evil 加载之后再进行初始化，防止 void-variable 错误
-  :after evil
+  :custom
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t)
   :config
-  ;; 设置缓存路径
-  (setq undohist-directory (expand-file-name "var/undohist" user-emacs-directory))
-  
-  ;; 排除不需要记录的文件
-  (setq undohist-ignored-files '("/tmp/" "/COMMIT_EDITMSG\\'"))
-  
-  ;; 初始化
-  (undohist-initialize))
+  (load-theme 'doom-dracula t)
+
+  (doom-themes-visual-bell-config)
+  (doom-themes-neotree-config)
+  (doom-themes-treemacs-config)
+  (doom-themes-org-config)
+  )
+
+;; 专门针对 emacs-lisp-mode
+
+(add-hook 'emacs-lisp-mode-hook #'(lambda ()
+  (font-lock-add-keywords nil
+    '(("\\(;.*\\)"  1 '(:foreground "#E67E22" :slant italic) t)
+      ("\\(\".*?\"\\)" 0 '(:foreground "#E67E22") t)))))
+
+;; ** Dashboard
+
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook))
 
 ;; * Evil
 
@@ -495,6 +485,24 @@
 
 ;; ** 编辑体验
 
+;; *** undo-fu
+
+(use-package undo-fu
+  :ensure t)
+(use-package undohist
+  :ensure t
+  ;; 关键：确保在 Evil 加载之后再进行初始化，防止 void-variable 错误
+  :after evil
+  :config
+  ;; 设置缓存路径
+  (setq undohist-directory (expand-file-name "var/undohist" user-emacs-directory))
+  
+  ;; 排除不需要记录的文件
+  (setq undohist-ignored-files '("/tmp/" "/COMMIT_EDITMSG\\'"))
+  
+  ;; 初始化
+  (undohist-initialize))
+
 ;; *** smartparens 自动配对。
 
 (use-package smartparens
@@ -710,11 +718,3 @@
 
   ;; 开启跟随模式
   (dirvish-side-follow-mode 1))
-
-;; * 测量启动时间(废弃)
-
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (message "Emacs 启动耗时: %.2fs，共触发了 %d 次垃圾回收。"
-;;                      (float-time (time-subtract after-init-time before-init-time))
-;;                      gcs-done)))
