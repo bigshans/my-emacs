@@ -8,6 +8,22 @@
   (interactive)
   (dired user-emacs-directory))
 
+(defun my-stuff/markdown-toggle-view-logic ()
+  "根据只读状态动态调整 Markdown 的视觉呈现"
+  (if buffer-read-only
+      (progn
+	;; 只读模式：进入预览效果
+	(markdown-view-mode)
+	(math-preview-all)
+	)
+    (progn
+      ;; 编辑模式：恢复源码显示
+      (markdown-mode)
+      (math-preview-clear-all)
+      ))
+  ;; 必须调用这个函数来强制让隐藏标记的设置立即生效
+  (font-lock-flush))
+
 (defun my-stuff/neotree-smart-enter ()
   "如果是目录，设置为根节点；如果是文件，直接打开。"
   (interactive)

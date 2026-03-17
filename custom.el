@@ -8,7 +8,7 @@
    '(consult corfu dirvish doom-themes evil-collection
 	     evil-nerd-commenter evil-numbers evil-surround general
 	     kind-icon markdown-mode math-preview nerd-icons
-	     no-littering olivetti orderless rainbow-delimiters
+	     no-littering olivetti orderless rainbow-delimiters sis
 	     smartparens undo-fu undohist vertico yasnippet-capf
 	     yasnippet-snippets))
  '(package-vc-selected-packages

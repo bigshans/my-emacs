@@ -1,43 +1,82 @@
-;; --- Emacs 配置文件 ---
+;; -- Emacs 个人配置 --
+
 ;; * 基础配置
-;; 配置语言为英语， dirvish 只能处理英文的问题
-(setenv "LC_ALL" "C")
-;; 强制 Emacs 在与子进程通信时使用 UTF-8
-(set-selection-coding-system 'utf-8)
-(set-next-selection-coding-system 'utf-8)
-(setq-default process-coding-system '((utf-8 . utf-8)))
-;; ** 目录配置
+
+;; ** 快速启动
+
+(defvar file-name-handler-alist-original file-name-handler-alist)
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.6
+      file-name-handler-alist nil
+      site-run-file nil)
+
+(defvar my/gc-cons-threshold 100000000)
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold my/gc-cons-threshold
+                  gc-cons-percentage 0.1
+                  file-name-handler-alist file-name-handler-alist-original)))
+
+(add-hook 'minibuffer-setup-hook (lambda ()
+                                   (setq gc-cons-threshold (* my/gc-cons-threshold 2))))
+(add-hook 'minibuffer-exit-hook (lambda ()
+                                  (garbage-collect)
+                                  (setq gc-cons-threshold my/gc-cons-threshold)))
+;; ** 路径与目录整理
+
+;; 将包文件放入到 =~/.emacs.d/var=。
+
+(setq package-user-dir (expand-file-name "var/elpa" user-emacs-directory))
+
 ;; 将包管理缓存放入到 =~/.emacs.d/var/eln-cache= 下。
+
 (when (boundp 'native-comp-eln-load-path)
   (setq native-comp-eln-load-path
         (list (expand-file-name "var/eln-cache/" user-emacs-directory))))
-;; 将包文件放入到 =~/.emacs.d/var=。
-(setq package-user-dir (expand-file-name "var/elpa" user-emacs-directory))
-;; 设置独立的 =custom.el=，保持 =init.el= 文件干净。
+
+;; 设置独立的 =custom.el=，保持 =init.el= 文件干净。如果 =custom.el= 存在，则加载 =custom.el= 。
+
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load custom-file))
-;; 创建 undo 缓存文件
+
+;; 创建 undo 缓存文件夹。
+
 (let ((undo-dir (expand-file-name "var/undo-history" user-emacs-directory)))
   (unless (file-exists-p undo-dir)
     (make-directory undo-dir t)))
-;; 设置 `lib` ，放置自定义插件。
+
+;; 设置 `lib` ，放置自定义代码。
+
 (add-to-list 'load-path (expand-file-name "lib" user-emacs-directory))
 
-;; ** 加载杂项函数
+;; 加载工具函数。
 
 (require 'stuff)
 
-;; ** 界面设置
-;; 去除烦人的铃声。
-(setq ring-bell-function 'ignore)
+;; ** 行为与界面调整
+
+;; *** 调整界面
+
 ;; 去除启动时的教程页。
+
 (setq inhibit-startup-message t)
+
 ;; 关闭菜单栏、工具栏、滚动条。
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-;; 设置字体
+
+;; 设置行号，并全局默认启用。
+
+(setq column-number-mode t)
+(global-display-line-numbers-mode t)
+
+;; *** 设置字体
+
+;; 分别设置中文与英文字体。中文用霞鹜文楷，英文随意。
 
 (defun set-font (english chinese size-decipoints)
   "SIZE-DECIPOINTS 为十分之一点，例如 125 代表 12.5pt。"
@@ -52,88 +91,91 @@
 
   ;; 3. 视觉比例微调
   ;; 如果 12.5pt 下中英文还是不齐，微调这里的 1.06
-  (setq face-font-rescale-alist `((,chinese . 1.06))))
+  (setq face-font-rescale-alist `((,chinese . 1.08))))
 
-;; --- 调用示例 ---
-;; 125 代表 12.5pt，这通常是 12 到 13 之间的完美平衡点
-(set-font "JetBrainsMono Nerd Font" "lxgw wenkai mono" 138)
+(set-font "JetBrainsMono Nerd Font" "lxgw wenkai mono" 140)
 
-;; 补充：增加一点行间距，防止姚体或文楷这类字体在视觉上挤压显扁
+;; 补充：增加一点行间距，防止姚体或文楷这类字体在视觉上挤压显扁。
+
 (setq-default line-spacing 0.15)
-;; 设置行号。
-(setq column-number-mode t)
-(global-display-line-numbers-mode t)
-;; 快速启动。
-(defvar file-name-handler-alist-original file-name-handler-alist)
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6
-      file-name-handler-alist nil
-      site-run-file nil)
-(defvar my/gc-cons-threshold 100000000)
-
-(add-hook 'emacs-startup-hook ; hook run after loading init files
-          (lambda ()
-            (setq gc-cons-threshold my/gc-cons-threshold
-                  gc-cons-percentage 0.1
-                  file-name-handler-alist file-name-handler-alist-original)))
-
-(add-hook 'minibuffer-setup-hook (lambda ()
-                                   (setq gc-cons-threshold (* my/gc-cons-threshold 2))))
-(add-hook 'minibuffer-exit-hook (lambda ()
-                                  (garbage-collect)
-                                  (setq gc-cons-threshold my/gc-cons-threshold)))
 
 ;; 设置字体缓存。
+
 (setq inhibit-compacting-font-caches t)
+
+;; *** 行为优化
+
 ;; 禁止自动弹出原生编译的警告和错误窗口。
 (setq native-comp-async-report-warnings-errors 'silent)
-;; ** 行为优化
-;; 1. 将退出时的多次询问合并为一次（只针对有修改的 Buffer 列表确认一遍）
+
+
+;; 去除烦人的铃声
+
+(setq ring-bell-function 'ignore)
+
+;; 将退出时的多次询问合并为一次（只针对有修改的 Buffer 列表确认一遍）
+
 (setq confirm-kill-emacs #'yes-or-no-p)
-;; 2. 将所有的 yes/no 输入简化为 y/n
+
+;; 将所有的 yes/no 输入简化为 y/n
+
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; ** 设置包管理器
+
 ;; 引入内置的包管理器。
+
 (require 'package)
+
 ;; 配置镜像源并初始化包管理器。
+
 (setq package-archives '(("gnu"    . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
                          ("nongnu" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/nongnu/")
                          ("melpa"  . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
 
 (package-initialize)
 
-;; 自动安装并配置 `use-package`
+;; *** 自动安装并启用 `use-package`
+
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
 (require 'use-package)
+
+;; 默认 ensure 为 =t= 。
+
 (setq use-package-always-ensure t)
 
 ;; ** 配置主题
+
+;; 主题为 dracula 。
+
 (use-package doom-themes
   :ensure t
   :custom
-  ;; Global settings (defaults)
-  (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
-  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  ;; for treemacs users
-  (doom-themes-treemacs-theme "doom-dracula") ; use "doom-colors" for less minimal icon theme
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t)
   :config
   (load-theme 'doom-dracula t)
 
-  ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
-  ;; Enable custom neotree theme (nerd-icons must be installed!)
   (doom-themes-neotree-config)
-  ;; or for treemacs users
   (doom-themes-treemacs-config)
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+  (doom-themes-org-config)
+  )
 
-;; * 一些杂项
+;; 专门针对 emacs-lisp-mode
+
+(add-hook 'emacs-lisp-mode-hook #'(lambda ()
+  (font-lock-add-keywords nil
+    '(("\\(;.*\\)"  1 '(:foreground "#E67E22" :slant italic) t)
+      ("\\(\".*?\"\\)" 0 '(:foreground "#E67E22") t)))))
+
+;; ** no-littering 规范配置目录结构
+
 ;; 整理目录文件，保持 =~/.emacs.d= 整洁
+
 (use-package no-littering
   :config
   ;; 这会将所有的最近打开记录、历史等自动存入 ~/.emacs.d/var/ 和 ~/.emacs.d/etc/
@@ -141,19 +183,35 @@
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
   (setq backup-directory-alist
       `(("." . ,(no-littering-expand-var-file-name "backups/")))))
-;; 设置 outline 折叠
-(require 'simple-outshine)
-(use-package outline
-    :ensure nil
-    :config
-    :hook (
-           (emacs-lisp-mode . my-outline/setup-elisp)
-           (markdown-mode . my-outline/setup-markdown)
-          )
-)
 
-;; * Evil 配置
-;; ** 增强 undo
+;; ** outline 设置，文档化配置文件注释。
+
+;; 设置 outline 折叠
+
+(require 'simple-outshine)
+
+(use-package outline
+  :ensure nil
+  :hook (
+	 (emacs-lisp-mode . my-outline/setup-elisp)
+	 )
+  )
+
+;; ** recentf
+
+(use-package recentf
+  :ensure nil ; 内置功能不需要下载
+  :hook (after-init . recentf-mode)
+  :config
+  (setq recentf-max-saved-items 200     ; 设置保存最近文件的上限
+        recentf-exclude '("/tmp/" "/ssh:" "/var/folders/" ".*-autoloads\\.el\\" ".*\\.gz\\") ; 排除掉不需要记录的路径
+        recentf-auto-cleanup 'never)   ; 避免在启动时因为检查远程文件而卡顿
+  
+  ;; 自动保存 recentf 列表（默认是退出时才保存，容易丢失）
+  (run-at-time nil 300 'recentf-save-list))
+
+;; ** undo-fu
+
 (use-package undo-fu
   :ensure t)
 (use-package undohist
@@ -170,8 +228,10 @@
   ;; 初始化
   (undohist-initialize))
 
+;; * Evil
+
 ;; ** 引入 Evil
-;; 引入 Evil 。
+
 (use-package evil
   :ensure t
   :init
@@ -184,7 +244,10 @@
   
   :config
   (evil-mode 1)
-
+  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
+  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
+  (define-key evil-visual-state-map (kbd "j") 'evil-next-visual-line)
+  (define-key evil-visual-state-map (kbd "k") 'evil-previous-visual-line)
   ;; 强制大写 Y 复制到系统 (+ 寄存器)
   (evil-define-key '(normal visual) 'global (kbd "Y") 
     (lambda () (interactive) 
@@ -203,10 +266,52 @@
   (define-key minibuffer-local-map (kbd "ESC") 'abort-recursive-edit)
   (global-set-key (kbd "<escape>") 'keyboard-quit)
   (setq evil-disable-insert-state-bindings t)
-
   )
 
-;; ** Evil 增强
+;; ** sis 输入法切换
+(use-package sis
+  :ensure t
+  :config
+  ;; 1. 配置输入法后端
+  (sis-ism-lazyman-config "1" "2" 'fcitx5) 
+
+  ;; 2. 核心功能：进入 Normal 模式自动切英文
+  (sis-global-cursor-color-mode 1) ; 随输入法改变光标颜色（紫色系适配）
+  (sis-global-respect-mode 1)      ; 核心：回到 Normal 模式切英文
+  (sis-global-context-mode 1)      ; 智能记忆：回到 Insert 模式恢复上次状态
+  
+  ;; 3. 视觉美化：适配你的紫色美学
+  (setq sis-cursor-color-zh "#bd93f9"   ; 中文时用紫色
+        sis-cursor-color-en "#6272a4")) ; 英文时用暗蓝
+
+;; ** which-key
+
+(use-package which-key
+  :defer 1
+  :init (setq which-key-idle-delay 0.3)
+  :config (which-key-mode))
+
+;; ** general.el 快捷键管理
+
+(use-package general
+  :ensure t
+  :after evil ; 确保在 collection 之后加载，才能覆盖它
+  :init
+  (setq general-override-states '(insert
+				  emacs
+				  hybird
+				  visual
+				  motion
+				  operator
+				  replace
+				  ))
+  :config
+  (general-auto-unbind-keys)
+  (general-evil-setup)
+  )
+
+;; ** evil-collection
+
 ;; 自动为 Emacs 其他界面（如 Dired, Magit）提供 Vim 快捷键
 (use-package evil-collection
   :after evil 
@@ -214,16 +319,22 @@
   :config
   ;; 不直接运行，而是等 Emacs 启动完成后再执行
   (evil-collection-init))
-;; 模拟 vim 自动增加自动减少数字的功能。
+
+;; ** 调整行为，尽量与 vim 贴合
+
+;; *** evil-numbers 数字自增/自减
+
 (use-package evil-numbers
   :ensure t
+  ;; 由于快捷键被占用，最好改换快捷键
   :bind (("C-c C-=" . evil-numbers/inc-at-pt)
          ("C-c C--" . evil-numbers/dec-at-pt))
   :config
   ;; 如果你希望支持二进制、八进制和十六进制，可以开启此项
   (setq evil-numbers/pad-at-point t))
 
-;; 复刻 vim-sandwich / vim-surround (操作括号、引号)
+;; *** evil-surround 模拟 vim-sandwich
+
 (use-package evil-surround
   :ensure t
   :config
@@ -243,42 +354,24 @@
 
   (evil-define-key 'visual 'global (kbd "s") 'evil-surround-region))
 
-;; 模仿 clever-f
+;; *** evil-simple-f 模仿 clever-f
+
 (use-package evil-simple-f
-  :ensure nil
+  :load-path "lib"
   :after evil
   :bind (:map evil-normal-state-map
               ("f" . evil-simple-f-jump)
               ("F" . evil-simple-f-jump)))
 
-;; 复刻 nerdcommenter (快速注释)
+;; *** nerdcommenter 快速注释
+
 (use-package evil-nerd-commenter
   :ensure t)
 
-;; * 快捷键展示
-;; 引入 which-key
-(use-package which-key
-  :defer 1
-  :init (setq which-key-idle-delay 0.3)
-  :config (which-key-mode))
+;; *** Leader 键设置
 
-;; 引入 genral.el
-;; 设置快捷键 shortcuts
 (use-package general
-  :ensure t
-  :after evil ; 确保在 collection 之后加载，才能覆盖它
-  :init
-  (setq general-override-states '(insert
-				  emacs
-				  hybird
-				  visual
-				  motion
-				  operator
-				  replace
-				  ))
   :config
-  (general-auto-unbind-keys)
-  (general-evil-setup)
   (general-create-definer my-leader-def
     :states '(normal visual motion)
     :keymaps 'override
@@ -305,7 +398,10 @@
     )
   )
 
-;; * 搜索增强
+;; * 搜索
+
+;; ** vertico
+
 (use-package vertico
   :init
   (vertico-mode)
@@ -324,6 +420,8 @@
         completion-category-defaults nil
         completion-category-overrides '((file (styles . (partial-completion))))))
 
+;; ** consult 增强 vertico
+
 ;; 增强搜索功能 (类似 LeaderF 的功能集)
 (use-package consult
   :after general
@@ -331,13 +429,19 @@
   ;; 绑定到你的 Leader 键
   (my-leader-def
     :prefix "SPC"
+    "fr" '(consult-recent-file :which-key "最近文件")
     "ff" '(consult-find :which-key "找文件")
     "s" '(:ignore t :which-key "search")
     "sb" '(consult-buffer :which-key "切换 Buffer")
     "sl" '(consult-line :which-key "当前文件搜索")
-    "sr" '(consult-ripgrep :which-key "项目全局搜索 (Ripgrep)")))
+    "sr" '(consult-ripgrep :which-key "项目全局搜索 (Ripgrep)")
+    )
+  )
 
-;; * Markdown 增强
+;; * 编辑优化
+
+;; ** Markdown 增强
+
 (use-package markdown-mode
   :mode ("\\.md\\'" . gfm-mode)
   :custom
@@ -353,34 +457,9 @@
                      (visual-line-mode 1)))       ; 软折行
 
   :config
-  (defun my/markdown-toggle-view-logic ()
-    "根据只读状态动态调整 Markdown 的视觉呈现"
-    (if buffer-read-only
-	(progn
-	  ;; 只读模式：进入预览效果
-	  (markdown-view-mode)
-	  (math-preview-all)
-	  )
-      (progn
-	;; 编辑模式：恢复源码显示
-	(markdown-mode)
-	(math-preview-clear-all)
-	))
-    ;; 必须调用这个函数来强制让隐藏标记的设置立即生效
-    (font-lock-flush))
-  (add-hook 'markdown-mode-hook
-	    (lambda ()
-	      ;; 解决 TAB 被抢占的问题
-	      (local-set-key (kbd "<tab>") 'markdown-cycle)
-	      ;; 某些环境下 TAB 映射为 C-i，建议也绑上
-	      (local-set-key (kbd "C-i") 'markdown-cycle)
-	      
-	      ;; 确保 outline 识别 Markdown 的标题
-	      (setq-local outline-regexp "^#+ ")))
-
   (add-hook 'markdown-mode-hook
             (lambda ()
-              (add-hook 'read-only-mode-hook #'my/markdown-toggle-view-logic nil t)))
+              (add-hook 'read-only-mode-hook #'my-stuff/markdown-toggle-view-logic nil t)))
 
   (custom-set-faces
    ;; 确保标题继承 default 的字体族，只改变高度和颜色
@@ -388,20 +467,36 @@
    '(markdown-italic-face ((t (:slant italic :foreground "#b48ead")))))
   )
 
-;; MathJax 实时渲染
+(use-package outline
+  :ensure nil
+  :hook (
+	 (markdown-mode . my-outline/setup-markdown)
+	 )
+  )
+
+;; *** math-preview
+
+;; MathJax 实时渲染，需要 math-preview 。
+
 (use-package math-preview
   :custom
   (math-preview-command "/home/aerian/.npm-packages/bin/math-preview")
   :hook (markdown-mode . math-preview-all)
   )
 
-;; 沉浸式居中布局 (Olivetti)
+;; *** olivetti 沉浸式居中布局
+
+;; 类似 vim 的 Goyo 。
+
 (use-package olivetti
   :hook (markdown-mode . olivetti-mode) 
   :custom
   (olivetti-body-width 90))
-;; * 编辑体验
-;; 自动配对。
+
+;; ** 编辑体验
+
+;; *** smartparens 自动配对。
+
 (use-package smartparens
   :ensure t
   :init
@@ -428,7 +523,10 @@
     (sp-local-pair "/*" "*/"))
 )
 
+;; *** rainbow-delimiters
+
 ;; 彩虹括号，不使之目眩。
+
 (use-package rainbow-delimiters
   :ensure t
   ;; 确保在编程和 Markdown 模式下都开启
@@ -453,8 +551,10 @@
   (set-face-attribute 'rainbow-delimiters-unmatched-face nil 
                       :foreground "white" :background "#FF0000" :weight 'bold))
 
-;; * 自动补全
-;;; --- 1. Yasnippet 配置 ---
+;; ** 自动补全
+
+;; *** yasnippet 配置
+
 (use-package yasnippet
   :ensure t
   :config
@@ -466,7 +566,7 @@
   :ensure t
   :after (yasnippet corfu))
 
-;;; --- 2. 图标配置 (Kind-icon) ---
+;; *** kind-icon
 (use-package kind-icon
   :ensure t
   :after corfu
@@ -475,7 +575,7 @@
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-;;; --- 3. 核心补全配置 (Corfu) ---
+;; *** corfu 补全
 (use-package corfu
   :ensure t
   :if (display-graphic-p)
@@ -487,11 +587,9 @@
   (corfu-auto-prefix 1)
   (corfu-cycle t)
   :config
-  ;; --- 核心修复：后端集成逻辑 ---
   (defun my/setup-corfu-backends ()
     ;; 使用 add-hook 并在 append 位置设为 t，确保 yasnippet 不会顶掉原有的后端
     (add-hook 'completion-at-point-functions #'yasnippet-capf 100 t))
-
   ;; 在编程模式下加载
   (add-hook 'prog-mode-hook #'my/setup-corfu-backends)
 
@@ -533,7 +631,10 @@
 
 ;; * 文件树
 
+;; ** nerd-icons 文件图标
 (use-package nerd-icons :ensure t)
+
+;; ** dired
 
 (use-package dired
   :ensure nil
@@ -549,10 +650,19 @@
 (setq dired-omit-files "^\\.\\|^\\.\\.$") ; Optional: Hide all dotfiles except . and ..
 (add-hook 'dired-mode-hook (lambda () (dired-omit-mode 1)))
 
+;; ** dirvish
+
+;; 尽量模仿 neotree 。不使用 neotree 是因为 neotree 太拉了。
+
 (use-package dirvish
   :ensure t
   :init
-  ;; 1. 彻底解决中文环境下“总计/total”行无法隐藏的问题
+  ;; 彻底解决中文环境下“总计/total”行无法隐藏的问题
+  (setenv "LC_ALL" "C")
+  ;; 强制 Emacs 在与子进程通信时使用 UTF-8
+  (set-selection-coding-system 'utf-8)
+  (set-next-selection-coding-system 'utf-8)
+  (setq-default process-coding-system '((utf-8 . utf-8)))
   (setenv "LC_ALL" "C")
   (dirvish-override-dired-mode)
   :config
@@ -601,7 +711,8 @@
   ;; 开启跟随模式
   (dirvish-side-follow-mode 1))
 
-;; * 测量启动时间
+;; * 测量启动时间(废弃)
+
 ;; (add-hook 'emacs-startup-hook
 ;;           (lambda ()
 ;;             (message "Emacs 启动耗时: %.2fs，共触发了 %d 次垃圾回收。"
