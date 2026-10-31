@@ -56,7 +56,17 @@
     '(project-name vcs lsp check compilation
       buffer-encoding indent-info major-mode process time))
 
-  (doom-modeline-mode 1))
+  ;; Dashboard 也有自己的 modeline，不要用包默认的极简版。
+  (doom-modeline-def-modeline 'dashboard
+    '(bar my-evil-state buffer-default-directory-simple remote-host)
+    '(project-name vcs lsp check compilation
+      buffer-encoding major-mode process time))
+
+  (doom-modeline-mode 1)
+
+  ;; 确保 Dashboard buffer 使用上面的 dashboard 布局。
+  (add-hook 'dashboard-mode-hook
+            (lambda () (doom-modeline-set-modeline 'dashboard))))
 
 (provide 'conf.d/modeline)
 ;;; conf.d/modeline.el ends here

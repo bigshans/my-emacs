@@ -120,6 +120,8 @@
 
 ;; 用 tab-bar 模拟 airline 的 buffer/tab 切换。
 (tab-bar-mode 1)
+;; 新 tab 默认打开空 buffer，而不是复制当前 buffer。
+(setq tab-bar-new-tab-choice "*scratch*")
 
 ;;; 搜索 / 终端 / 异步 / 包管理 ----------------------------------------
 
