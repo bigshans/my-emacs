@@ -15,6 +15,7 @@
 (require 'core/packages)
 (require 'core/builtin)
 (require 'core/theme)
+(require 'conf.d/modeline)
 (require 'conf.d/evil)
 (require 'core/keymaps)
 
@@ -22,6 +23,7 @@
 (require 'conf.d/editing)
 (require 'conf.d/completion)
 (require 'conf.d/markdown)
+(require 'conf.d/org)
 (require 'conf.d/dired)
 (require 'conf.d/git)
 (require 'conf.d/session)

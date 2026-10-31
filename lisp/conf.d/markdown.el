@@ -18,10 +18,7 @@
   (add-hook 'markdown-mode-hook
             (lambda ()
               (add-hook 'read-only-mode-hook
-                        #'my-stuff/markdown-toggle-view-logic nil t)))
-  (custom-set-faces
-   '(markdown-link-face ((t (:foreground "#83a598" :underline t))))
-   '(markdown-italic-face ((t (:slant italic :foreground "#b48ead"))))))
+                        #'my-stuff/markdown-toggle-view-logic nil t))))
 
 (use-package outline
   :ensure nil

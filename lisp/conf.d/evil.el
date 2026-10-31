@@ -47,8 +47,8 @@
   (sis-global-cursor-color-mode 1)
   (sis-global-respect-mode 1)
   (sis-global-context-mode 1)
-  (setq sis-cursor-color-zh "#bd93f9"
-        sis-cursor-color-en "#6272a4"))
+  (setq sis-cursor-color-zh "#c08eaf"
+        sis-cursor-color-en "#66a9c9"))
 
 ;;; which-key -----------------------------------------------------------
 

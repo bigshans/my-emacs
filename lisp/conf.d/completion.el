@@ -101,7 +101,6 @@
         '((internal-border-width . 1)
           (vertical-scroll-bars . nil)
           (no-accept-focus . t)))
-  (set-face-attribute 'corfu-border nil :background "#3d4451")
 
   ;; 自动展开 snippet。
   (advice-add 'corfu-insert :after

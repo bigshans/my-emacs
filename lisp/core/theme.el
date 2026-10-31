@@ -1,27 +1,14 @@
 ;;; core/theme.el --- 主题与启动面板 -*- lexical-binding: t; -*-
 ;;
-;; 对应 ~/.vim/core/theme.vim。Vim 默认用 inkstone（宣纸/苍海），
-;; Emacs 这边继续使用 doom-dracula；后续可换成 catppuccin。
+;; 对应 ~/.vim/core/theme.vim。Vim 默认用 inkstone（沧海），
+;; Emacs 这里使用同一套 canghai 调色板的本地移植。
 
-(use-package doom-themes
-  :ensure t
-  :custom
-  (doom-themes-enable-bold t)
-  (doom-themes-enable-italic t)
-  :config
-  (load-theme 'doom-dracula t)
-  (doom-themes-visual-bell-config)
-  (doom-themes-neotree-config)
-  (doom-themes-treemacs-config)
-  (doom-themes-org-config))
+;; 墨观 Inkstone · 沧海：从 ~/.vim/bundle/vim-inkstone 移植的调色板。
+(add-to-list 'custom-theme-load-path
+             (expand-file-name "lisp/themes" user-emacs-directory))
 
-;; 专门针对 emacs-lisp-mode 的注释/字符串着色。
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            (font-lock-add-keywords
-             nil
-             '(("\\(;.*\\)" 1 '(:foreground "#E67E22" :slant italic) t)
-               ("\\(\".*?\"\\)" 0 '(:foreground "#E67E22") t)))))
+;; 主题本体在 lisp/themes/inkstone-canghai-theme.el。
+(load-theme 'inkstone-canghai t)
 
 ;;; Dashboard -----------------------------------------------------------
 
