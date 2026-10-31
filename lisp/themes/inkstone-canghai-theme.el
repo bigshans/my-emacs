@@ -80,10 +80,8 @@
    `(line-number-minor-tick ((,class (:background ,bg-alt :foreground ,guide))))
 
    ;; mode-line / header-line
-   `(mode-line ((,class (:background ,bg-alt2 :foreground ,fg
-                                     :box (:line-width 1 :color ,border)))))
-   `(mode-line-inactive ((,class (:background ,bg-alt :foreground ,comment
-                                              :box (:line-width 1 :color ,guide)))))
+   `(mode-line ((,class (:background ,bg-alt2 :foreground ,fg))))
+   `(mode-line-inactive ((,class (:background ,bg-alt :foreground ,comment))))
    `(mode-line-buffer-id ((,class (:foreground ,cursor :weight bold))))
    `(mode-line-emphasis ((,class (:foreground ,warn :weight bold))))
    `(mode-line-highlight ((,class (:foreground ,info :box (:line-width 1 :color ,border)))))
