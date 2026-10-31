@@ -26,7 +26,7 @@
 
   (my-leader-def
     ;; 基础操作
-    "q" '(my-stuff/smart-quit :which-key "close window")
+    "q" '(my-stuff/smart-quit :which-key "close buffer / quit")
     "Q" '(kill-emacs :which-key "quit emacs")
 
     ;; 注释

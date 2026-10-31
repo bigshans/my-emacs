@@ -241,14 +241,15 @@
    `(tab-bar-tab-ungrouped ((,class (:background ,bg-alt2 :foreground ,comment))))
 
    ;; Doom modeline
-   `(doom-modeline-evil-normal-state ((,class (:foreground ,str :weight bold))))
-   `(doom-modeline-evil-insert-state ((,class (:foreground ,num :weight bold))))
-   `(doom-modeline-evil-visual-state ((,class (:foreground ,type :weight bold))))
-   `(doom-modeline-evil-motion-state ((,class (:foreground ,func :weight bold))))
-   `(doom-modeline-evil-operator-state ((,class (:foreground ,keyword :weight bold))))
-   `(doom-modeline-evil-replace-state ((,class (:foreground ,tag :weight bold))))
-   `(doom-modeline-evil-emacs-state ((,class (:foreground ,comment :weight bold))))
-   `(doom-modeline-evil-user-state ((,class (:foreground ,prop :weight bold))))
+   ;; Evil 状态模块使用整块背景色，切换状态时背景随之变化（类似 airline）。
+   `(doom-modeline-evil-normal-state ((,class (:background ,str :foreground ,badge-fg :weight bold))))
+   `(doom-modeline-evil-insert-state ((,class (:background ,num :foreground ,badge-fg :weight bold))))
+   `(doom-modeline-evil-visual-state ((,class (:background ,type :foreground ,badge-fg :weight bold))))
+   `(doom-modeline-evil-motion-state ((,class (:background ,func :foreground ,badge-fg :weight bold))))
+   `(doom-modeline-evil-operator-state ((,class (:background ,keyword :foreground ,badge-fg :weight bold))))
+   `(doom-modeline-evil-replace-state ((,class (:background ,tag :foreground ,badge-fg :weight bold))))
+   `(doom-modeline-evil-emacs-state ((,class (:background ,comment :foreground ,badge-fg :weight bold))))
+   `(doom-modeline-evil-user-state ((,class (:background ,prop :foreground ,badge-fg :weight bold))))
    `(doom-modeline-buffer-path ((,class (:foreground ,fg))))
    `(doom-modeline-buffer-file ((,class (:foreground ,fg :weight bold))))
    `(doom-modeline-buffer-modified ((,class (:foreground ,warn :weight bold))))

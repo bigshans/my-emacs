@@ -34,12 +34,45 @@
 	(neotree-change-root)
       (neotree-enter))))
 
+(defun my-stuff/listed-buffer-p (buffer)
+  "BUFFER 是否算作 Vim 意义上的 listed buffer。
+排除隐藏 buffer、Dashboard、Messages、补全/帮助等内部 buffer。"
+  (and (buffer-live-p buffer)
+       (with-current-buffer buffer
+         (let ((name (buffer-name)))
+           (and (not (string-prefix-p " " name))
+                (not (memq major-mode '(dashboard-mode
+                                        messages-buffer-mode
+                                        completion-list-mode
+                                        help-mode
+                                        profiler-report-mode))))))))
+
+(defun my-stuff/listed-buffer-count ()
+  "返回当前 listed buffer 的数量。"
+  (length (seq-filter #'my-stuff/listed-buffer-p (buffer-list))))
+
+(defun my-stuff/force-kill-current-buffer ()
+  "强制删除当前 buffer，对应 Vim 的 :bdelete!。
+如果当前窗口不是唯一窗口，也会像 Vim 一样关闭该窗口。"
+  (let ((buffer (current-buffer)))
+    (when (> (length (window-list)) 1)
+      (delete-window))
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (set-buffer-modified-p nil))
+      (let ((kill-buffer-query-functions nil))
+        (kill-buffer buffer)))))
+
 (defun my-stuff/smart-quit ()
-  "如果是最后一个窗口则直接退出 Emacs，否则关闭当前窗口。"
+  "对应 Vim 的 utils#quit。
+有多个 listed buffer 时强制删除当前 buffer；
+否则关闭当前窗口，已经是最后一个窗口时退出 Emacs。"
   (interactive)
-  (if (one-window-p)
-      (kill-emacs)
-    (delete-window)))
+  (if (> (my-stuff/listed-buffer-count) 1)
+      (my-stuff/force-kill-current-buffer)
+    (if (one-window-p)
+        (kill-emacs)
+      (delete-window))))
 
 (defun my-stuff/neotree-go-up-and-refresh ()
   "直接利用 neo-buffer--start-node 向上跳转。"
@@ -64,6 +97,11 @@
       (if (file-directory-p filename)
 	  (dirvish-subtree-toggle)
 	(dired-find-file)))))
+
+(defun my-stuff/dirvish-find-file-other-tab ()
+  "在文件树中把光标所在条目在新 tab 中打开。"
+  (interactive)
+  (find-file-other-tab (dired-get-file-for-visit)))
 
 (defun my-stuff/dirvish-h-action ()
   "智能 h：如果是已展开的子树，则折叠它。"

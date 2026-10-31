@@ -83,7 +83,7 @@ Leader 是 `SPC`。大部分分组由 `use-package` 的 `:which-key` 提供，`w
 
 | 键 | 功能 |
 |---|---|
-| `SPC q` | 关闭窗口；最后一个窗口则退出 Emacs |
+| `SPC q` | 有多个 buffer 时删除当前 buffer；否则关闭窗口/退出 Emacs |
 | `SPC Q` | 退出 Emacs |
 | `SPC fs` / `C-s` | 保存 |
 | `SPC fS` | 以 root 保存 |
@@ -106,6 +106,17 @@ Leader 是 `SPC`。大部分分组由 `use-package` 的 `:which-key` 提供，`w
 | `SPC w1..w9` | 切换到第 1..9 个窗口 |
 | `SPC wc` | 关闭窗口 |
 | `SPC ws` / `SPC wv` | 上下 / 左右分屏 |
+
+文件树（dirvish-side）内：
+
+| 键 | 功能 |
+|---|---|
+| `t` | 在新 tab 中打开当前文件/目录 |
+| `h` / `l` | 折叠 / 打开或展开子树 |
+| `TAB` | 展开/折叠子树 |
+| `e` / `E` | 其他窗口 / 分屏打开 |
+| `q` | 关闭文件树 |
+| `?` | dirvish 菜单 |
 
 ### 搜索
 
@@ -193,7 +204,7 @@ Leader 是 `SPC`。大部分分组由 `use-package` 的 `:which-key` 提供，`w
 | `p` | Projects |
 | `s` | Sessions |
 | `e` | 新建空 buffer |
-| `q` | 关闭窗口；最后一个窗口则退出 Emacs |
+| `q` | 关闭 Dashboard / 当前 buffer；最后一个窗口则退出 Emacs |
 
 ## 主题与 modeline
 

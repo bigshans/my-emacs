@@ -35,12 +35,12 @@
   (setq dirvish-side-attributes '(vc-state nerd-icons collapse))
 
   (with-eval-after-load 'evil
-    (evil-define-key 'normal 'global (kbd "\\") #'dirvish-side)
     (evil-define-key 'normal dirvish-mode-map
       (kbd "h") #'my-stuff/dirvish-h-action
       (kbd "l") #'my-stuff/dirvish-l-action
       (kbd "j") #'evil-next-line
       (kbd "k") #'evil-previous-line
+      (kbd "t") #'my-stuff/dirvish-find-file-other-tab
       (kbd "TAB") #'dirvish-subtree-toggle
       (kbd "<backspace>") #'dired-up-directory
       (kbd ".") #'dired-omit-mode
@@ -63,6 +63,11 @@
 ;; Vim: <leader>ft 文件树。
 (my-leader-def
   "ft" '(dirvish-side :which-key "file tree"))
+
+;; Vim: `\` 直接打开/关闭文件树。
+;; 注意要放在 `use-package dirvish` 的 :config 之外；
+;; 否则要等 dirvish 第一次加载后才生效。
+(evil-define-key 'normal 'global (kbd "\\") #'dirvish-side)
 
 (provide 'conf.d/dired)
 ;;; conf.d/dired.el ends here
