@@ -119,6 +119,9 @@
       (lambda () (interactive) (tab-bar-select-tab n)))))
 
 ;; 用 tab-bar 模拟 airline 的 buffer/tab 切换。
+;; Emacs 里 Alt 通常就是 Meta，所以用 (meta) 而不是 (alt)。
+(setopt tab-bar-select-tab-modifiers '(meta)
+        tab-bar-tab-hints t)
 (tab-bar-mode 1)
 ;; 新 tab 默认打开空 buffer，而不是复制当前 buffer。
 (setq tab-bar-new-tab-choice "*scratch*")
