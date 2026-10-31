@@ -4,7 +4,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages nil)
+ '(easysession-directory
+   (expand-file-name "var/sessions" user-emacs-ensime-directory))
+ '(package-selected-packages
+   '(consult corfu dashboard dirvish doom-themes easysession
+	     evil-collection evil-multiedit evil-nerd-commenter
+	     evil-numbers evil-surround general kind-icon magit
+	     markdown-mode math-preview multiple-cursors nerd-icons
+	     no-littering olivetti orderless projectile
+	     rainbow-delimiters sis smartparens undo-fu undohist
+	     vertico yasnippet-capf yasnippet-snippets))
  '(package-vc-selected-packages
    '((lsp-bridge :url "https://github.com/manateelazycat/lsp-bridge"))))
 (custom-set-faces

@@ -1,3 +1,5 @@
+;;; stuff.el --- 自定义工具函数 -*- lexical-binding: t; -*-
+
 (defun my-stuff/open-init-file ()
   "打开配置文件 init.el"
   (interactive)
@@ -69,5 +71,34 @@
   (when (and (file-directory-p (dired-get-filename nil t))
              (dirvish-subtree--expanded-p))
     (dirvish-subtree-toggle)))
+
+(defun my/get-easysession-list ()
+  "从 easysession-directory 获取 session 文件名列表。"
+  (let ((dir (expand-file-name (or (bound-and-true-p easysession-directory) 
+                                  "~/.emacs.d/.easysessions/"))))
+    (if (file-directory-p dir)
+        (directory-files dir nil "^[^.]")
+      nil)))
+
+(defun my-stuff/dashboard-insert-easysessions (list-size)
+  "完全适配提供的宏定义的 session 列表生成器。"
+  (let ((sessions (my/get-easysession-list))) ; 获取 session 列表的函数保持不变
+    (dashboard-insert-section
+     "Sessions"                    ; section-name
+     sessions                      ; list
+     list-size                     ; list-size
+     'my-easysession               ; shortcut-id
+     "s"                            ; shortcut-char (标题旁会显示 [s])
+     `(lambda (&rest _)            ; action: 点击时的执行逻辑
+        (easysession-load ,el))
+     ;; 以下是 widget-params: 
+     ;; 根据 dashboard 惯例，这里通常直接传入显示在界面的字符串
+     (format "%s" el))))           ; 这里的 el 会被宏内部的循环正确解析
+
+;; 定义点击列表项后的动作
+(defun dashboard-action-my-easysession (session)
+  "点击 Dashboard 中的 session 时调用 easysession-load。"
+  (message "正在加载 Session: %s" session)
+  (easysession-load session)) ; 👈 调用 easysession 的加载命令
 
 (provide 'stuff)
