@@ -149,7 +149,7 @@ Leader 是 `SPC`。大部分分组由 `use-package` 的 `:which-key` 提供，`w
 | `gd` | 跳转定义 |
 | `gy` / `gi` | 类型定义 / 实现 |
 | `gr` | 查找引用 |
-| `K` / `SPC jk` | 显示文档（GUI 下为 eldoc-box 浮窗） |
+| `K` / `SPC jk` | 显示文档（GUI 为 eldoc-box 浮窗，TUI 为 `*eldoc*` buffer） |
 | `[g` / `]g` | 上一个 / 下一个诊断 |
 | `SPC ja` | code action |
 | `SPC jc` | 当前行诊断 |

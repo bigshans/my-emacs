@@ -7,9 +7,11 @@
 ;; 触发 prog-mode-hook 时再懒加载。
 
 ;; K 在 GUI 下用 eldoc-box 的 childframe 浮窗显示文档；
-;; 终端下退回 echo area 的 eldoc。
+;; TUI 下打开 *eldoc* buffer，避免 echo area 消息被立即覆盖。
 (defun my/show-doc-at-point ()
-  "显示光标处符号的文档。GUI 下用 childframe 浮窗，终端下用 echo area。"
+  "显示光标处符号的文档。
+GUI 下用 eldoc-box 的 childframe 浮窗；TUI 下打开 *eldoc* buffer，
+比 echo area 更稳定，也不会被后续消息立即覆盖。"
   (interactive)
   (if (display-graphic-p)
       (progn
@@ -18,7 +20,11 @@
         (condition-case err
             (eldoc-box-help-at-point)
           (error (message "没有可显示的文档：%s" (error-message-string err)))))
-    (eldoc-print-current-symbol-info)))
+    ;; TUI：先刷新文档，再显示可滚动、可复制的 *eldoc* buffer。
+    (eldoc-print-current-symbol-info)
+    (condition-case err
+        (eldoc-doc-buffer t)
+      (error (message "没有可显示的文档：%s" (error-message-string err))))))
 
 (use-package eldoc-box
   :ensure t
