@@ -39,9 +39,19 @@
   (size-indication-mode 1)
   (display-time-mode 1)
 
+  ;; Evil 状态用文字显示，比单纯图标更明确。
+  (doom-modeline-def-segment my-evil-state
+    (when (bound-and-true-p evil-local-mode)
+      (let* ((state (symbol-name evil-state))
+             (face (intern (format "doom-modeline-evil-%s-state" state))))
+        (propertize (format " %s " (upcase state))
+                    'face (doom-modeline-face
+                           (if (facep face) face 'doom-modeline))
+                    'help-echo (format "Evil state: %s" state)))))
+
   ;; 更紧凑、更有信息量的布局。
   (doom-modeline-def-modeline 'main
-    '(bar modals matches buffer-info remote-host
+    '(bar my-evil-state matches buffer-info remote-host
           buffer-position word-count selection-info)
     '(project-name vcs lsp check compilation
       buffer-encoding indent-info major-mode process time))
