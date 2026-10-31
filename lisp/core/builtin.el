@@ -24,7 +24,6 @@
 
 ;;; 杂项 ---------------------------------------------------------------
 
-(setq save-place-mode t)
 (save-place-mode 1)
 
 (provide 'core/builtin)

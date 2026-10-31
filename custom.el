@@ -5,15 +5,17 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(easysession-directory
-   (expand-file-name "var/sessions" user-emacs-ensime-directory))
+   (expand-file-name "var/sessions" user-emacs-directory))
  '(package-selected-packages
-   '(consult corfu dashboard dirvish doom-themes easysession
-	     evil-collection evil-multiedit evil-nerd-commenter
-	     evil-numbers evil-surround general kind-icon magit
+   '(apheleia cape consult consult-eglot corfu dashboard diff-hl
+	     dirvish doom-themes easysession eat eldoc-box embark
+	     embark-consult evil-collection evil-easymotion
+	     evil-multiedit evil-nerd-commenter evil-numbers
+	     evil-surround general jinx kind-icon magit marginalia
 	     markdown-mode math-preview multiple-cursors nerd-icons
-	     no-littering olivetti orderless projectile
-	     rainbow-delimiters sis smartparens undo-fu undohist
-	     vertico yasnippet-capf yasnippet-snippets))
+	     no-littering olivetti orderless projectile rainbow-delimiters
+	     sis smartparens undo-fu undohist valign vertico
+	     yasnippet-capf yasnippet-snippets))
  '(package-vc-selected-packages
    '((lsp-bridge :url "https://github.com/manateelazycat/lsp-bridge"))))
 (custom-set-faces
